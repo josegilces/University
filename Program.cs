@@ -206,7 +206,6 @@ namespace MatricesBinarias
         {
             FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(file);
-            int counter = 0; //this is a counter for aesthetic purposes
 
             int[,] matrix1 = new int[3, 4];
             int[,] matrix2 = new int[3, 4];
@@ -218,8 +217,7 @@ namespace MatricesBinarias
 
                 if (matrixIdentifier == matrixIdentifier1)
                 {
-                    ++counter;
-                    Console.WriteLine($"Matrix {counter}: {matrixIdentifier}");
+                    Console.WriteLine($"Matrix 1: {matrixIdentifier}");
 
                     for (int i = 0; i < rows; i++)
                     {
@@ -231,23 +229,55 @@ namespace MatricesBinarias
                         }
                         Console.WriteLine();
                     }
-                    Console.ReadKey();
                 }
                 else
                 {
-                    for (int i = 0; i < rows; i++)
+                    if (matrixIdentifier == matrixIdentifier2)
                     {
-                        for (int j = 0; j < columns; j++)
+                        Console.WriteLine($"Matrix 2: {matrixIdentifier}");
+
+                        for (int i = 0; i < rows; i++)
                         {
-                            reader.ReadInt32();
+                            for (int j = 0; j < columns; j++)
+                            {
+                                int value = reader.ReadInt32();
+                                matrix2[i, j] = value;
+                                Console.Write(matrix2[i, j] + "\t");
+                            }
+                            Console.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < rows; i++)
+                        {
+                            for (int j = 0; j < columns; j++)
+                            {
+                                reader.ReadInt32();
+                            }
                         }
                     }
                 }
             }
 
-           
+            if (!(matrix1[0,0] > 0)) Console.WriteLine(" The first matrix could not be found.");
+            if (!(matrix2[0, 0] > 0)) Console.WriteLine(" The second matrix could not be found.");
+
             reader.Close();
             file.Close();
+
+            //operation
+            int[,] result = new int[3,4];
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    reader.ReadInt32();
+                }
+            }
+
+            Console.ReadKey();
         }
 
     }
