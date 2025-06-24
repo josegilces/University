@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MatricesBinarias
 {
+    /*En un archivo matrices.bin, se guardarán la configuración y elementos de matrices. La configuración es secuencia(identificador de la matriz), filas y columnas. Los elementos de la matriz serán generados de manera aletoria con elementos de 2 cifras.
+En matrices.bin se guardan todas la matrices que se soliciten generar y la secuencia identificará la matriz.
+Se podrán realizar operaciones entre matrices (+, -, *), para lo cual se seleccionará dos matrices y se mostrará el resultado de la operación en la consola.
+La aplicación contendrá una opción que permita mostrar por consola una determinada matriz, para lo cual se solicitará por teclado el ingreso de la secuencia de la matriz que se desee revisar.
+    */
     class Program
     {
         static byte rows = 3;
         static byte columns = 4;
-        static string path = @"c:\intel\h.txt";
+        static string path = "";
+        static byte counter = 0; //help assign a name to the result matrices
 
-
-        //en UN ARCHIVO, SE ALMACENE MATRICES. ESTABLECER QUE SE PUEDA AGREGAR MUCHAS MATRICES. PARA PODER IDENTIFICAR CADA UNA DE LAS MATRICES, NECESITO DETERMIANR UNA SECUENCIA, LA CANTIDAD DE FILAS Y COLUMNAS, LUEGO PROCEDO A GRABAR LOS ELEMENTOS DE ESA MATRIZ.  Cada matriz debe tener 12 elementos de 2 cifras. Usar sistemas de guardado binario.
         static void Main(string[] args)
         {
             //welcome message and aesthetics
@@ -25,9 +25,7 @@ namespace MatricesBinarias
             Console.SetWindowSize(100, 30); // width x height (in characters)
             Console.SetBufferSize(100, 30); // buffer size (equal to or greater than the window)
 
-            byte option = 0;
-            
-            bool setDimensions = true;
+            byte option = 0; //option from Menu
 
             do
             {
@@ -40,79 +38,125 @@ namespace MatricesBinarias
                 Console.WriteLine("!");
 
                 Console.WriteLine("\n\tMenu");
-                Console.WriteLine(" 1.- Generate a new matrix in binary file");
-                Console.WriteLine(" 2.- Matrix operations");
-                Console.WriteLine(" 3.- Read file");
-                Console.WriteLine(" 4.- Delete matrix");
-                Console.WriteLine(" 5.- Delete file");
-                Console.WriteLine(" 6.- Leave");
+                Console.WriteLine(" 1.- Set the path of the file");
+                Console.WriteLine(" 2.- Generate a new matrix in binary file");
+                Console.WriteLine(" 3.- Matrix operations");
+                Console.WriteLine(" 4.- Read file");
+                Console.WriteLine(" 5.- Read matrix");
+                Console.WriteLine(" 6.- Delete file");
+                Console.WriteLine(" 7.- Leave");
                 Console.Write("\n Enter option: ");
-                option = byte.Parse(Console.ReadLine());
+
+                //input validation
+                try
+                {
+                    option = byte.Parse(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine(" Write a option! (Ex: 1)");
+                    Console.ReadKey();
+                }
 
                 Console.Clear();
 
                 switch (option)
                 {
+                    //set the path of the file
                     case 1:
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.Write(" -> ");
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("Generate a new matrix in binary file");
+                        Console.WriteLine("Set the path of the file");
 
-                        //if (!setDimensions)
-                        //{
-                        //    Console.WriteLine("\n Write the array's dimensions");
-                        //    Console.Write(" Rows: ");
-                        //    rows = Convert.ToByte(Console.ReadLine());
-                        //    Console.Write(" Columns: ");
-                        //    columns = Convert.ToByte(Console.ReadLine());
-
-                        //    setDimensions = true; //to know if the user has already set dimensions and we dont have issues with width x height
-                        //}
-
-                        Console.Write(" First, you need to write the path of the file: ");
+                        Console.Write("\n Write the path of the file: ");
                         path = Console.ReadLine();
-                        Console.Write(" Then, you need to write a matrix identifier: ");
-                        string matrixIdentifier = Console.ReadLine();
-
-                        function_WriteOnFile(matrixIdentifier, false);
-
-
                         break;
+
+                    //generate a new matrix in binary file
                     case 2:
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.Write(" -> ");
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("Matrix operations");
-                        Console.WriteLine(" Addition");
-                        Console.WriteLine(" Subtraction");
-                        Console.WriteLine(" Multiplication");
-                        Console.WriteLine("\n Choose the operation: ");
-                        byte option2 = Convert.ToByte(Console.ReadLine());
-
-                        switch (option2)
+                        Console.WriteLine("Generate a new matrix in binary file");
+                        if (!(path.Length > 0))
                         {
-                            case 1:
-                                Console.Write(" You need to write the first matrix identifier: ");
-                                string matrixIdentifier1 = Console.ReadLine();
-                                Console.Write(" You need to write the second matrix identifier: ");
-                                string matrixIdentifier2 = Console.ReadLine();
-                                function_Operations(matrixIdentifier1, matrixIdentifier2);
-                                break;
+                            Console.Write("\n First, you need to set the path of the file!");
                         }
+                        else
+                        {
+                            Console.Write("\n You need to write a matrix identifier: ");
+                            string matrixIdentifier = Console.ReadLine();
+
+                            WriteOnFile(matrixIdentifier);
+                            Console.WriteLine("\n The file has been deleted successfully!");
+                        }
+
+                        Console.ReadKey();
                         break;
+                    //matrix operations
                     case 3:
-                        function_FileReading();
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.Write(" -> ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("Matrix operations");
+                        Console.WriteLine("\n 1.- Addition");
+                        Console.WriteLine(" 2.- Subtraction");
+                        Console.WriteLine(" 3.- Multiplication");
+                        Console.WriteLine(" 4.- Back");
+
+                        Console.Write("\n Choose the operation: ");
+
+                        //input validation
+                        byte operation = 0;
+
+                        try
+                        {
+                            operation = Convert.ToByte(Console.ReadLine());
+                            if (operation == 4)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.Write("\n You need to write the first matrix identifier: ");
+                                string matrixIdentifier1 = Console.ReadLine();
+                                Console.Write("\n You need to write the second matrix identifier: ");
+                                string matrixIdentifier2 = Console.ReadLine();
+
+                                SaveInsideArray(matrixIdentifier1, matrixIdentifier2, operation);
+                                Console.ReadKey();
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine(" Write a option! (Ex: 1)");
+                            Console.ReadKey();
+                        }
+
+                        break;
+                    //read file
+                    case 4:
+
+                        FileReading();
                         Console.ReadKey();
 
                         break;
-                    //case 3:
-                    //    fn_ActualizaArchivo(ruta);
-                    //    break;
-                    //case 4:
-                    //    fn_EliminarArchivo(ruta);
-                    //    break;
+                    //read matrix
                     case 5:
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.Write(" -> ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(" Read matrix");
+                        Console.Write("\n Write the matrix identifier: ");
+                        string identifier = Console.ReadLine();
+                        FileReading(true, identifier);
+
+                        Console.ReadKey();
+                        break;
+
+                    //delete file
+                    case 6:
                         try
                         {
                             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -120,6 +164,7 @@ namespace MatricesBinarias
                             Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine("Delete file");
                             File.Delete(path);
+                            path = "";
                             Console.Write("\n The file has been deleted successfully!");
                             Console.ReadKey();
                         }
@@ -131,10 +176,15 @@ namespace MatricesBinarias
                 }
 
             }
-            while (option != 6);
+            while (option != 7);
+            Console.Write("Thank u for using my program ");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write(username);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("!");
         }
         //function to read the dimensions to be used from the keyboard and write them to a file
-        static void function_WriteOnFile(string matrixIdentifier, bool mode)
+        static void WriteOnFile(string matrixIdentifier, bool mode = false, int[,] result = null)
         {
             try
             {
@@ -144,16 +194,32 @@ namespace MatricesBinarias
                 FileStream file = new FileStream(path, FileMode.Append, FileAccess.Write);
                 BinaryWriter writer = new BinaryWriter(file);
 
-
-                //generate rows and columns
-                writer.Write(matrixIdentifier);
-
-                for (int i = 0; i < rows; i++)
+                //here the program can choose whether to generate values for the rows and columns or to save the result of a matrices operation
+                if (!mode)
                 {
-                    for (int j = 0; j < columns; j++)
+                    //generate rows and columns
+                    writer.Write(matrixIdentifier);
+
+                    for (int i = 0; i < rows; i++)
                     {
-                        value = random.Next(10, 100);
-                        writer.Write(value);
+                        for (int j = 0; j < columns; j++)
+                        {
+                            value = random.Next(10, 100);
+                            writer.Write(value);
+                        }
+                    }
+                }
+                else //save the result of a matrices operation
+                {
+                    writer.Write(matrixIdentifier);
+
+                    for (int i = 0; i < rows; i++)
+                    {
+                        for (int j = 0; j < columns; j++)
+                        {
+                            value = result[i, j];
+                            writer.Write(value);
+                        }
                     }
                 }
 
@@ -167,7 +233,7 @@ namespace MatricesBinarias
             }
 
         }
-        static void function_FileReading()
+        static void FileReading(bool mode = false, string matrixIdentifier = null)
         {
             try
             {
@@ -175,23 +241,65 @@ namespace MatricesBinarias
                 BinaryReader reader = new BinaryReader(file);
                 int counter = 0; //this is a counter for aesthetic purposes
 
-                //read rows
-                while (reader.PeekChar() != -1)
+                //here the program can choose whether to read all values for the rows and columns or a specified matrix
+                if (!mode)
                 {
-                    ++counter;
-                    Console.WriteLine($"Matrix {counter}: {reader.ReadString()}");
-
-                    for (int i = 0; i < rows; i++)
+                    //read all rows and columns
+                    while (reader.PeekChar() != -1)
                     {
-                        for (int j = 0; j < columns; j++)
+                        ++counter;
+                        Console.WriteLine($"Matrix {counter}: {reader.ReadString()}");
+
+                        for (int i = 0; i < rows; i++)
                         {
-                            Console.Write(reader.ReadInt32() + "\t");
+                            for (int j = 0; j < columns; j++)
+                            {
+                                Console.Write(reader.ReadInt32() + "\t");
+                            }
+                            Console.WriteLine();
                         }
                         Console.WriteLine();
                     }
-                    Console.WriteLine();
+                }
+                else //read specified matrix
+                {
+                    bool found = false;
+                    while (reader.PeekChar() != -1)
+                    {
+                        string identifier = reader.ReadString();
+                        if (identifier == matrixIdentifier)
+                        {
+                            Console.WriteLine($"Matrix {identifier}");
+                            for (int i = 0; i < rows; i++)
+                            {
+                                for (int j = 0; j < columns; j++)
+                                {
+                                    Console.Write(reader.ReadInt32() + "\t");
+                                }
+                                Console.WriteLine();
+                            }
+                            Console.WriteLine();
+
+                            found = true;
+                        }
+                        else //read the binary file's values until find the matrix needed
+                        {
+                            for (int i = 0; i < rows; i++)
+                            {
+                                for (int j = 0; j < columns; j++)
+                                {
+                                    reader.ReadInt32();
+                                }
+                            }
+                        }
+
+                    }
+                    //message if dont found the matrix 
+                    if (!found) Console.WriteLine("\n The matrix could not be found.");
+
                 }
 
+                //free memory
                 reader.Close();
                 file.Close();
             }
@@ -199,20 +307,20 @@ namespace MatricesBinarias
             {
                 Console.WriteLine("Error reading file: {0}", ex.Message);
             }
-            Console.ReadKey();
 
         }
-        static void function_Operations(string matrixIdentifier1, string matrixIdentifier2)
+        static void SaveInsideArray(string matrixIdentifier1, string matrixIdentifier2, byte operation)
         {
+            //connection to the file
             FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(file);
 
-            int[,] matrix1 = new int[3, 4];
+            int[,] matrix1 = new int[3, 4]; //array to save the matrices
             int[,] matrix2 = new int[3, 4];
 
             //print and save the values in a two-dimensional array
             while (reader.PeekChar() != -1)
-            {
+            { 
                 string matrixIdentifier = reader.ReadString();
 
                 if (matrixIdentifier == matrixIdentifier1) //identify the matrixIdentifier 1 and 2 inside the binary file and save them 
@@ -260,27 +368,63 @@ namespace MatricesBinarias
                     }
                 }
             }
-
-            //message if dont found the matrix 
-            if (!(matrix1[0,0] > 0)) Console.WriteLine(" The first matrix could not be found.");
-            if (!(matrix2[0, 0] > 0)) Console.WriteLine(" The second matrix could not be found.");
-
+            //free memory
             reader.Close();
             file.Close();
 
-            //addition operation
-            int[,] result = new int[3,4];
-
-            for (int i = 0; i < rows; i++)
+            //message if dont found the matrix 
+            if (!(matrix1[0, 0] > 0)) Console.WriteLine(" The first matrix could not be found.");
+            if (!(matrix2[0, 0] > 0)) Console.WriteLine(" The second matrix could not be found.");
+            else
             {
-                for (int j = 0; j < columns; j++)
-                {
-                    int temp = matrix1[i, j] + matrix2[i, j];
-                    result[i, j] = temp;
-                }
+                Operations(matrix1, matrix2, operation);
             }
-            //function_WriteOnFile()
 
+        }
+        static void Operations(int[,] matrix1, int[,] matrix2, byte operation)
+        {
+            int[,] result = new int[3, 4];
+
+            switch (operation)
+            {
+                //addition operation
+                case 1:
+                    {
+                        for (int i = 0; i < rows; i++)
+                        {
+                            for (int j = 0; j < columns; j++)
+                            {
+                                int temp = matrix1[i, j] + matrix2[i, j];
+                                result[i, j] = temp;
+                            }
+                        }
+                        break;
+                    }
+                //subtraction
+                case 2:
+                    for (int i = 0; i < rows; i++)
+                    {
+                        for (int j = 0; j < columns; j++)
+                        {
+                            int temp = matrix1[i, j] - matrix2[i, j];
+                            result[i, j] = temp;
+                        }
+                    }
+                    break;
+                //multiplication
+                case 3:
+                    for (int i = 0; i < rows; i++)
+                    {
+                        for (int j = 0; j < columns; j++)
+                        {
+                            int temp = matrix1[i, j] * matrix2[i, j];
+                            result[i, j] = temp;
+                        }
+                    }
+                    break;
+            }
+            
+            //print the results
             Console.WriteLine(" The matrix result between Matrix 1 en Matrix 2 is:");
             for (int i = 0; i < rows; i++)
             {
@@ -290,8 +434,9 @@ namespace MatricesBinarias
                 }
                 Console.WriteLine();
             }
-            Console.ReadKey();
-        }
+            ++counter;
+            WriteOnFile($"MatrixResult {counter}", true, result);
 
+        }
     }
 }
