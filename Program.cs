@@ -75,7 +75,7 @@ namespace MatricesBinarias
                         Console.Write(" Then, you need to write a matrix identifier: ");
                         string matrixIdentifier = Console.ReadLine();
 
-                        function_WriteOnFile(matrixIdentifier);
+                        function_WriteOnFile(matrixIdentifier, false);
 
 
                         break;
@@ -97,7 +97,7 @@ namespace MatricesBinarias
                                 string matrixIdentifier1 = Console.ReadLine();
                                 Console.Write(" You need to write the second matrix identifier: ");
                                 string matrixIdentifier2 = Console.ReadLine();
-                                function_Addition(matrixIdentifier1, matrixIdentifier2);
+                                function_Operations(matrixIdentifier1, matrixIdentifier2);
                                 break;
                         }
                         break;
@@ -134,7 +134,7 @@ namespace MatricesBinarias
             while (option != 6);
         }
         //function to read the dimensions to be used from the keyboard and write them to a file
-        static void function_WriteOnFile(string matrixIdentifier)
+        static void function_WriteOnFile(string matrixIdentifier, bool mode)
         {
             try
             {
@@ -202,7 +202,7 @@ namespace MatricesBinarias
             Console.ReadKey();
 
         }
-        static void function_Addition(string matrixIdentifier1, string matrixIdentifier2)
+        static void function_Operations(string matrixIdentifier1, string matrixIdentifier2)
         {
             FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(file);
@@ -215,7 +215,7 @@ namespace MatricesBinarias
             {
                 string matrixIdentifier = reader.ReadString();
 
-                if (matrixIdentifier == matrixIdentifier1)
+                if (matrixIdentifier == matrixIdentifier1) //identify the matrixIdentifier 1 and 2 inside the binary file and save them 
                 {
                     Console.WriteLine($"Matrix 1: {matrixIdentifier}");
 
@@ -232,7 +232,7 @@ namespace MatricesBinarias
                 }
                 else
                 {
-                    if (matrixIdentifier == matrixIdentifier2)
+                    if (matrixIdentifier == matrixIdentifier2) //identify and save second matrix inside the binary file
                     {
                         Console.WriteLine($"Matrix 2: {matrixIdentifier}");
 
@@ -249,6 +249,7 @@ namespace MatricesBinarias
                     }
                     else
                     {
+                        //read the binary file's values until find the matrix needed 
                         for (int i = 0; i < rows; i++)
                         {
                             for (int j = 0; j < columns; j++)
@@ -260,23 +261,35 @@ namespace MatricesBinarias
                 }
             }
 
+            //message if dont found the matrix 
             if (!(matrix1[0,0] > 0)) Console.WriteLine(" The first matrix could not be found.");
             if (!(matrix2[0, 0] > 0)) Console.WriteLine(" The second matrix could not be found.");
 
             reader.Close();
             file.Close();
 
-            //operation
+            //addition operation
             int[,] result = new int[3,4];
 
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    reader.ReadInt32();
+                    int temp = matrix1[i, j] + matrix2[i, j];
+                    result[i, j] = temp;
                 }
             }
+            //function_WriteOnFile()
 
+            Console.WriteLine(" The matrix result between Matrix 1 en Matrix 2 is:");
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    Console.Write(result[i, j] + "\t");
+                }
+                Console.WriteLine();
+            }
             Console.ReadKey();
         }
 
